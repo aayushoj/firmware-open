@@ -16,6 +16,11 @@ while read line; do
 done < "$1"
 
 source "$1"
-make -C ec VERSION="${VERSION}" "${EC_ARGS[@]}" clean
-make -C ec VERSION="${VERSION}" "${EC_ARGS[@]}" -j "$(nproc)"
-cp "ec/build/${BOARD}/${VERSION}/ec.rom" "$2"
+pushd ec >/dev/null
+DATE="$(git show --format="%cs" --no-patch --no-show-signature)"
+REV="$(git describe --always --dirty --abbrev=7)"
+VERSION="${DATE}_${REV}"
+make "${EC_ARGS[@]}" clean
+make "${EC_ARGS[@]}" -j "$(nproc)"
+cp "build/${BOARD}/${VERSION}/ec.rom" "$2"
+popd >/dev/null
